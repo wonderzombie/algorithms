@@ -5,8 +5,6 @@ import (
   "fmt"
 )
 
-type CycleLookup []int
-
 func isEven(x int) bool {
   return (x % 2 == 0)
 }
@@ -20,28 +18,51 @@ func nextCycle(i int) int {
   return i
 }
 
+func findInArray(needle int, haystack []int) (int, bool) {
+  for i := 0; i < len(haystack); i++ {
+    if haystack[i] == needle {
+      return i, true
+    }
+  }
+  return -1, false
+}
+
 func calculateCycleLengthWithMemo(i int, memo []int) (int, []int) {
-  length := 0
+  length := 1
+  newMemo := make([]int, 0)
 
   for i != 1 {
-    // fmt.Printf("%d ", i)
     i = nextCycle(i)
     length += 1
+    newMemo = append(newMemo, i)
   }
 
-  return length, memo
+  return length, newMemo
 }
 
 func calculateCycleLength(i int) int {
-  var length = 0
+  length := 1
 
   for i != 1 {
-    // fmt.Printf("%d ", i)
     i = nextCycle(i)
     length += 1
   }
 
   return length
+}
+
+func calculateLongestCycleLength(min int, max int) int {
+  highestLength := 0
+
+  for i := min; i <= max; i++ {
+    length := calculateCycleLength(i)
+    fmt.Printf("Length for %v was %v.\n", i, length)
+    if length > highestLength {
+      highestLength = length
+    }
+  }
+
+  return highestLength
 }
 
 func main() {
@@ -54,17 +75,7 @@ func main() {
     panic(fmt.Sprintf("Max was less than min!"))
   }
 
-  fmt.Printf("Max: %d, Min: %d\n", max, min)
-
-  highestLength := 0
-
-  for i := min; i <= max; i++ {
-    length := calculateCycleLength(i)
-    fmt.Printf("Length for %v was %v.\n", i, length)
-    if length > highestLength {
-      highestLength = length
-    }
-  }
+  highestLength := calculateLongestCycleLength(min, max)
 
   fmt.Printf("highest length for %v - %v was: %v\n",
              min, max, highestLength)
