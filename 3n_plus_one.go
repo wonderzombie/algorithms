@@ -1,9 +1,13 @@
 package main
 
 import (
-  "flag"
   "fmt"
 )
+
+type Pair struct {
+  min int
+  max int
+}
 
 func isEven(x int) bool {
   return (x % 2 == 0)
@@ -56,7 +60,6 @@ func calculateLongestCycleLength(min int, max int) int {
 
   for i := min; i <= max; i++ {
     length := calculateCycleLength(i)
-    fmt.Printf("Length for %v was %v.\n", i, length)
     if length > highestLength {
       highestLength = length
     }
@@ -66,17 +69,31 @@ func calculateLongestCycleLength(min int, max int) int {
 }
 
 func main() {
-  var max, min int
-  flag.IntVar(&min, "min", 100, "integer to start with")
-  flag.IntVar(&max, "max", 200, "integer to end with")
-  flag.Parse()
+  boundList := make([]Pair, 0)
+  scanning := true
 
-  if max < min {
-    panic(fmt.Sprintf("Max was less than min!"))
+  for scanning {
+    bounds := new(Pair)
+    count, err := fmt.Scanln(&bounds.min, &bounds.max)
+
+    if count == 0 {
+      scanning = false
+      continue // TODO(mmontgomery): fix pls
+    } else if err != nil {
+      panic(fmt.Sprintf("Error: ", err))
+    }
+    if count != 2 {
+      panic("Exactly two arguments required.")
+    }
+    if bounds.max < bounds.min {
+      panic("Max was less than min!")
+    }
+
+    boundList = append(boundList, *bounds)
   }
 
-  highestLength := calculateLongestCycleLength(min, max)
-
-  fmt.Printf("highest length for %v - %v was: %v\n",
-             min, max, highestLength)
+  for _, bounds := range boundList {
+    highestLength := calculateLongestCycleLength(bounds.min, bounds.max)
+    fmt.Printf("%v %v %v", bounds.min, bounds.max, highestLength)
+  }
 }
