@@ -46,17 +46,49 @@ func uniq(list []float64) []float64 {
 	return list[0:i]
 }
 
-
 func normalizeExpenses(e []float64) []float64 {
 	sort.SortFloat64s(e)
 	e = uniq(e)
 	return e
 }
 
+func isLenEven(list []float64) bool {
+	return len(list) % 2 == 0
+}
+
+func min(a float64, b float64) float64 {
+	if b < a {
+		return b
+	}
+	return a
+}
+
+func calculateExpenseCorrection(report *ExpenseReport) float64 {
+	e := report.expenses
+	e = normalizeExpenses(e)
+
+	var (
+		diff1 float64
+		diff2 float64
+		correction float64
+	)
+	var m int = (len(e) - 1) / 2
+
+	if isLenEven(e) {
+	  diff1 = e[m + 1] - e[m]
+		diff2 = diff1
+	} else {
+		diff1 = e[m] - e[m - 1]
+		diff2 = e[m + 1] - e[m]
+	}
+	correction = min(diff1, diff2)
+
+	return correction
+}
 
 func main() {
 	report := readExpenses()
 	fmt.Printf("Expense report: %v\n", report)
-	normalized := normalizeExpenses(report.expenses)
-	fmt.Printf("Normalized expenses: %v", normalized)
+	correction := calculateExpenseCorrection(report)
+	fmt.Println(correction)
 }
